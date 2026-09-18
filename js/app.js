@@ -89,15 +89,33 @@ function finish() {
 }
 
 // ---- アラーム音(Web Audio。iOS はユーザー操作で unlock が必要) ----
+const muteBtn = $('mute');
+let muted = false;
+try { muted = localStorage.getItem('muted') === '1'; } catch (_) {}
+function renderMute() {
+  muteBtn.classList.toggle('off', muted);
+  muteBtn.setAttribute('aria-pressed', String(muted));
+  muteBtn.setAttribute('aria-label', muted ? 'サウンドオフ' : 'サウンドオン');
+}
+muteBtn.addEventListener('click', () => {
+  muted = !muted;
+  try { localStorage.setItem('muted', muted ? '1' : '0'); } catch (_) {}
+  if (muted && audioCtx) audioCtx.suspend();
+  if (!muted) unlockAudio();
+  renderMute();
+});
+renderMute();
+
 let audioCtx = null;
 function unlockAudio() {
+  if (muted) return;
   const AC = window.AudioContext || window.webkitAudioContext;
   if (!AC) return;
   if (!audioCtx) audioCtx = new AC();
   if (audioCtx.state === 'suspended') audioCtx.resume();
 }
 function beep() {
-  if (!audioCtx) return;
+  if (muted || !audioCtx) return;
   const t0 = audioCtx.currentTime;
   for (let i = 0; i < 3; i++) {
     for (let j = 0; j < 2; j++) {

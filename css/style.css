@@ -43,6 +43,22 @@ button {
 .mode.active { color: #fff; border-bottom-color: #fff; }
 .modes.locked .mode:not(.active) { opacity: 0.3; pointer-events: none; }
 
+/* ---- mute toggle ---- */
+.mute {
+  position: absolute;
+  top: calc(env(safe-area-inset-top) + 14px);
+  right: calc(env(safe-area-inset-right) + 16px);
+  width: 56px;
+  height: 56px;
+  padding: 14px;
+  color: #fff;
+}
+.mute svg { width: 100%; height: 100%; display: block; }
+.mute .cross { display: none; }
+.mute.off { color: #555; }
+.mute.off .wave { display: none; }
+.mute.off .cross { display: inline; }
+
 /* ---- display ---- */
 .display-wrap {
   flex: 1;
