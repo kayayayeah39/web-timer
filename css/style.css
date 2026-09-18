@@ -1,0 +1,116 @@
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body {
+  height: 100%;
+  background: #000;
+  color: #fff;
+  overflow: hidden;
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+  font-family: -apple-system, "Helvetica Neue", Arial, sans-serif;
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+}
+
+button {
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+/* ---- mode switch ---- */
+.modes {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  padding: 20px 16px 0;
+}
+.mode {
+  padding: 12px 28px;
+  font-size: 18px;
+  letter-spacing: 0.15em;
+  color: #555;
+  border-bottom: 2px solid transparent;
+}
+.mode.active { color: #fff; border-bottom-color: #fff; }
+.modes.locked .mode:not(.active) { opacity: 0.3; pointer-events: none; }
+
+/* ---- display ---- */
+.display-wrap {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 0;
+}
+.display {
+  font-family: -apple-system, "Helvetica Neue", "Segoe UI", Roboto, Arial, sans-serif;
+  font-variant-numeric: tabular-nums;
+  font-weight: 200;
+  line-height: 1;
+  white-space: nowrap;
+  font-size: 26vw;
+  letter-spacing: -0.02em;
+}
+.display.long { font-size: 17vw; }
+.display.done { animation: blink 1s steps(1) infinite; }
+@keyframes blink { 50% { opacity: 0.15; } }
+
+/* ---- countdown setter ---- */
+.setter {
+  display: flex;
+  gap: 6vw;
+  margin-top: 4vh;
+}
+.setter.hidden { display: none; }
+.unit {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.label { color: #666; font-size: 18px; width: 1.2em; text-align: center; }
+.adj {
+  width: 64px;
+  height: 64px;
+  font-size: 32px;
+  border: 1px solid #333;
+  border-radius: 50%;
+}
+.adj:active { background: #222; }
+
+/* ---- controls ---- */
+.controls {
+  display: flex;
+  justify-content: center;
+  gap: 24px;
+  padding: 0 16px 32px;
+}
+.ctl {
+  min-width: 180px;
+  padding: 20px 0;
+  font-size: 22px;
+  letter-spacing: 0.15em;
+  border: 1px solid #444;
+  border-radius: 40px;
+}
+.ctl.primary { border-color: #fff; }
+.ctl:active { background: #222; }
+
+@media (orientation: portrait) {
+  .display { font-size: 24vw; }
+  .display.long { font-size: 16vw; }
+}
+@media (max-width: 500px) {
+  .ctl { min-width: 130px; font-size: 18px; }
+  .adj { width: 48px; height: 48px; font-size: 24px; }
+  .mode { padding: 10px 14px; font-size: 14px; }
+}
