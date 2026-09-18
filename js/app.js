@@ -28,6 +28,60 @@ function format(totalSec) {
   return h > 0 ? `${h}:${pad(m)}:${pad(s)}` : `${pad(m)}:${pad(s)}`;
 }
 
+// ---- 7セグメント表示(SVG で描画。消灯セグメントも薄く描いてデジタル時計風に) ----
+const SVG_NS = 'http://www.w3.org/2000/svg';
+const hSeg = (c) => `8,${c} 13,${c - 5} 47,${c - 5} 52,${c} 47,${c + 5} 13,${c + 5}`;
+const vSeg = (x, y1, y2) => `${x},${y1} ${x + 5},${y1 + 5} ${x + 5},${y2 - 5} ${x},${y2} ${x - 5},${y2 - 5} ${x - 5},${y1 + 5}`;
+const SEGMENTS = {
+  a: hSeg(6), g: hSeg(50), d: hSeg(94),
+  f: vSeg(6, 8, 48), b: vSeg(54, 8, 48),
+  e: vSeg(6, 52, 92), c: vSeg(54, 52, 92),
+};
+const DIGIT_SEGS = ['abcdef', 'bc', 'abdeg', 'abcdg', 'bcfg', 'acdfg', 'acdefg', 'abc', 'abcdefg', 'abcdfg'];
+
+function makeDigit() {
+  const svg = document.createElementNS(SVG_NS, 'svg');
+  svg.setAttribute('viewBox', '-5 0 70 100');
+  svg.classList.add('digit');
+  for (const [name, points] of Object.entries(SEGMENTS)) {
+    const p = document.createElementNS(SVG_NS, 'polygon');
+    p.setAttribute('points', points);
+    p.dataset.seg = name;
+    svg.appendChild(p);
+  }
+  return svg;
+}
+function makeColon() {
+  const svg = document.createElementNS(SVG_NS, 'svg');
+  svg.setAttribute('viewBox', '0 0 24 100');
+  svg.classList.add('colon');
+  for (const y of [28, 72]) {
+    const r = document.createElementNS(SVG_NS, 'rect');
+    Object.entries({ x: 6, y: y - 6, width: 12, height: 12 }).forEach(([k, v]) => r.setAttribute(k, v));
+    svg.appendChild(r);
+  }
+  return svg;
+}
+
+let shownText = '';
+function drawDigits(text) {
+  if (text === shownText) return;
+  // 桁構成(例 "00:00" → "1:00:00")が変わったときだけ作り直す
+  const shape = text.replace(/\d/g, '0');
+  if (shape !== shownText.replace(/\d/g, '0')) {
+    display.replaceChildren(...[...text].map((ch) => (ch === ':' ? makeColon() : makeDigit())));
+  }
+  [...text].forEach((ch, i) => {
+    if (ch === ':') return;
+    const on = DIGIT_SEGS[Number(ch)];
+    display.children[i].querySelectorAll('polygon').forEach((p) => {
+      p.classList.toggle('on', on.includes(p.dataset.seg));
+    });
+  });
+  display.setAttribute('aria-label', text);
+  shownText = text;
+}
+
 function currentElapsed() {
   return state.elapsed + (state.running ? Date.now() - state.startedAt : 0);
 }
@@ -42,7 +96,7 @@ function render() {
     if (remainMs <= 0 && state.running) finish();
   }
   const text = format(sec);
-  if (display.textContent !== text) display.textContent = text;
+  drawDigits(text);
   display.classList.toggle('long', text.length > 5);
   display.classList.toggle('done', state.done);
 

@@ -68,16 +68,19 @@ button {
   justify-content: center;
   min-height: 0;
 }
+/* 高さ --h を画面幅と高さの小さい方に合わせて最大化
+   "00:00" = 幅 4×70+24 = 304 / 高さ 100、"0:00:00" = 5×70+2×24 = 398 / 高さ 100 */
 .display {
-  font-family: -apple-system, "Helvetica Neue", "Segoe UI", Roboto, Arial, sans-serif;
-  font-variant-numeric: tabular-nums;
-  font-weight: 200;
-  line-height: 1;
-  white-space: nowrap;
-  font-size: 26vw;
-  letter-spacing: -0.02em;
+  --h: min(31vw, 62vh);
+  display: flex;
+  align-items: center;
+  transform: skewX(-6deg);
 }
-.display.long { font-size: 17vw; }
+.display.long { --h: min(23.5vw, 62vh); }
+.display svg { height: var(--h); width: auto; display: block; }
+.display polygon { fill: #161616; }
+.display polygon.on { fill: #fff; }
+.display .colon rect { fill: #fff; }
 .display.done { animation: blink 1s steps(1) infinite; }
 @keyframes blink { 50% { opacity: 0.15; } }
 
@@ -121,10 +124,6 @@ button {
 .ctl.primary { border-color: #fff; }
 .ctl:active { background: #222; }
 
-@media (orientation: portrait) {
-  .display { font-size: 24vw; }
-  .display.long { font-size: 16vw; }
-}
 @media (max-width: 500px) {
   .ctl { min-width: 130px; font-size: 18px; }
   .adj { width: 48px; height: 48px; font-size: 24px; }
